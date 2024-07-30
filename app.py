@@ -1,12 +1,17 @@
 import os
 import pathlib
-
+import datetime
 import requests
 from flask import Flask, session, abort, redirect, request, render_template
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 app = Flask("Google Login App")
 app.secret_key = "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" # make sure this matches with that's in client_secret.json
@@ -18,9 +23,79 @@ client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
-    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid"],
-    redirect_uri="http://127.0.0.1:5000/callback"
+    scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email", "openid", "https://www.googleapis.com/auth/calendar"],
+    redirect_uri="http://127.0.0.1/callback", 
 )
+
+
+# If modifying these scopes, delete the file token.json.
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
+
+
+
+
+
+def main():
+    creds = None
+    
+    if os.path.exists("tokens.json"): #if logged in previously
+        creds = Credentials.from_authorized_user_file("token.json")
+        
+    if not creds or not creds.valid: #if token is invalid or expired
+        if creds and creds.expired and creds.refresh_token: 
+            creds.refresh(Request)
+        else:
+            creds = flow.credentials
+        #save the flow for future login
+        
+        with open("token.json", "w") as token: #write to file token.json
+            token.write(creds.to_json())
+            
+            
+    try:
+        service = build("calendar", "v3", credentials=creds)
+
+        # Call the Calendar API
+        now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
+        print("Getting the upcoming 10 events")
+        events_result = (
+            service.events()
+            .list(
+                calendarId="primary",
+                timeMin=now,
+                maxResults=10,
+                singleEvents=True,
+                orderBy="startTime",
+            )
+            .execute()
+        )
+        events = events_result.get("items", [])
+
+        if not events:
+            print("No upcoming events found.")
+            return
+
+        # Prints the start and name of the next 10 events
+        for event in events:
+            start = event["start"].get("dateTime", event["start"].get("date"))
+            print(start, event["summary"])
+
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+        
+
+ 
+
+
+
+
+
+
+
+
+
+
+
 
 
 def login_is_required(function):
@@ -33,6 +108,7 @@ def login_is_required(function):
     return wrapper
 
 
+#Routing
 @app.route("/login")
 def login():
     authorization_url, state = flow.authorization_url()
@@ -79,5 +155,20 @@ def index():
 def protected_area():
     return render_template("goals.html",names = session['name']) 
 
+@app.route("/calendar")
+def calendar():
+    main()
+    return render_template("calendar.html")
+
+    
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
+    
+    
+
+    
+
+
+
+#CODE
+
