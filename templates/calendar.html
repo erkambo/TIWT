@@ -1,4 +1,15 @@
 <!DOCTYPE html>
 <html lang = en>
-
+<head>
 <h1>Here is your calendar</h1>
+</head>
+
+<body>
+    <pre> 
+    {{calendarlist}}
+    <form action="{{ url_for('processingevent') }}" method="post"> 
+        <button type="submit">Create Event</button> 
+    </form> 
+    </pre>
+</body>
+

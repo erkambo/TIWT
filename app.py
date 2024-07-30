@@ -32,27 +32,30 @@ flow = Flow.from_client_secrets_file(
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
-
+class user:
+    creds = None
 
 
 def main():
-    creds = None
+    #This section checks for credentials
+    creds = None 
     
     if os.path.exists("tokens.json"): #if logged in previously
+        user.creds = Credentials.from_authorized_user_file("token.json")
         creds = Credentials.from_authorized_user_file("token.json")
-        
     if not creds or not creds.valid: #if token is invalid or expired
         if creds and creds.expired and creds.refresh_token: 
             creds.refresh(Request)
         else:
             creds = flow.credentials
+            user.creds = flow.credentials
         #save the flow for future login
         
         with open("token.json", "w") as token: #write to file token.json
             token.write(creds.to_json())
             
             
-    try:
+    try: #Get a list of events in your calendar
         service = build("calendar", "v3", credentials=creds)
 
         # Call the Calendar API
@@ -70,18 +73,51 @@ def main():
             .execute()
         )
         events = events_result.get("items", [])
-
+        
+        calendarlist = {}
         if not events:
-            print("No upcoming events found.")
+            print("No upcoming events found.") 
             return
 
         # Prints the start and name of the next 10 events
         for event in events:
             start = event["start"].get("dateTime", event["start"].get("date"))
-            print(start, event["summary"])
+            calendarlist[start] = event["summary"]
+        return calendarlist
 
     except HttpError as error:
         print(f"An error occurred: {error}")
+        
+
+def eventcreation():
+    creds = user.creds
+    service = build("calendar", "v3", credentials = creds)
+    
+    event = { #basically we need to create a lot of key value pairs
+        "summary": "My Python Event",
+        "location": "Somewhere Online",
+        "description": "This event very very cool like I love it!",
+        "colorID": 6,
+        "start":{
+            "dateTime":"2024-07-31T19:00:00", #datetime includes timestamp T and utc -5
+            "timeZone": "America/New_York",
+        },
+        "end":{
+            "dateTime":"2024-07-31T23:00:00", #datetime includes timestamp T and utc -5
+            "timeZone": "America/New_York",
+        },
+        
+        "attendees":[
+            
+            {"email":"boyaciogluerkam@gmail.com"},
+            {"email":"erkanbobo33@gmail.com"}
+        ]
+    
+    }
+    
+    event = service.events().insert(calendarId = "primary",body = event).execute()
+    print(f"Event Created {event.get('htmlLink')}")
+
         
 
  
@@ -157,9 +193,13 @@ def protected_area():
 
 @app.route("/calendar")
 def calendar():
-    main()
-    return render_template("calendar.html")
+    eventlist = main()
+    return render_template("calendar.html", calendarlist = eventlist)
 
+@app.route("/processingevent",methods=["POST"])
+def processingevent():
+    eventcreation()
+    return "Success"
     
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
