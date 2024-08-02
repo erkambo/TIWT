@@ -7,9 +7,24 @@
 <body>
     <pre> 
     {{calendarlist}}
-    <form action="{{ url_for('processingevent') }}" method="post"> 
+
+
+
+    <form action="{{ url_for('processingevent') }}" method="POST">  <!-- The form action sends all the data of the form to the specified url -->
+        <label for = "goal"> Goal: </label>
+        <input type="text" id="goal" name="goal"><br>
+
+        <label for = "details">Details:</label>
+        <textarea name = "details" id = "details" rows = "10" cols="30"></textarea><br>
+
+        <label for = "date"> End Date: </label><br>
+        <input type = "text" id = "date" name = "date">
+
         <button type="submit">Create Event</button> 
     </form> 
+
+
+    
     </pre>
 </body>
 

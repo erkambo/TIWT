@@ -2,7 +2,10 @@ import os
 import pathlib
 import datetime
 import requests
-from flask import Flask, session, abort, redirect, request, render_template
+import openai
+import re
+#from openai import OpenAI
+from flask import Flask, session, abort, redirect, request, render_template, jsonify
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
@@ -15,6 +18,7 @@ from googleapiclient.errors import HttpError
 
 app = Flask("Google Login App")
 app.secret_key = "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" # make sure this matches with that's in client_secret.json
+openai.api_key = "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" #api key
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # to allow Http traffic for local dev
 
@@ -35,6 +39,7 @@ SCOPES = ["https://www.googleapis.com/auth/calendar"]
 class user:
     creds = None
 
+#client = OpenAI()
 
 def main():
     #This section checks for credentials
@@ -88,45 +93,75 @@ def main():
     except HttpError as error:
         print(f"An error occurred: {error}")
         
-
-def eventcreation():
+def parsing_events(initial_response):
+    #Splitting response into individual day entries:
+    day_entries = initial_response.split("Day ")
+    
+    for entry in day_entries[1:]:
+        #Extract day number
+        day_number = entry.split(":")[0].strip()
+        
+        #extract summary
+        
+        summary_match = re.search(r'summary: ([^\n]+)', entry) #includes else condition so it at least shows something
+        summary = summary_match.group(0) if summary_match else f"Day {day_number}"
+                                  
+        # Extract description
+        description_match = re.search(r'description: ([^\n]+)', entry)
+        description = description_match.group(1).strip() if description_match else "No Description included"
+        
+        color_id = 6
+        
+        #Start datetime:
+        start_match = re.search(r'start: { dateTime: ([^,]+), timeZone: ([^}]+) }', entry)
+        start_datetime = start_match.group(1).strip() if start_match else None
+        start_timezone = start_match.group(2).strip() if start_match else "America/New_York"
+        
+        # Extract end datetime
+        end_match = re.search(r'end: { dateTime: ([^,]+), timeZone: ([^}]+) }', entry)
+        end_datetime = end_match.group(1).strip() if end_match else None
+        end_timezone = end_match.group(2).strip() if end_match else "America/New_York"
+        
+        # Create the event
+        event = {
+            "summary": summary,
+            "description": description,
+            "colorId": color_id,
+            "start": {
+                "dateTime": start_datetime,
+                "timeZone": start_timezone,
+            },
+            "end": {
+                "dateTime": end_datetime,
+                "timeZone": end_timezone,
+            }
+        }
+        eventcreation(event)
+        
+def eventcreation(gptevent):
     creds = user.creds
     service = build("calendar", "v3", credentials = creds)
     
-    event = { #basically we need to create a lot of key value pairs
-        "summary": "My Python Event",
-        "location": "Somewhere Online",
-        "description": "This event very very cool like I love it!",
-        "colorID": 6,
-        "start":{
-            "dateTime":"2024-07-31T19:00:00", #datetime includes timestamp T and utc -5
-            "timeZone": "America/New_York",
-        },
-        "end":{
-            "dateTime":"2024-07-31T23:00:00", #datetime includes timestamp T and utc -5
-            "timeZone": "America/New_York",
-        },
-        
-        "attendees":[
-            
-            {"email":"boyaciogluerkam@gmail.com"},
-            {"email":"erkanbobo33@gmail.com"}
-        ]
-    
-    }
+    event = gptevent
     
     event = service.events().insert(calendarId = "primary",body = event).execute()
     print(f"Event Created {event.get('htmlLink')}")
-
+    
+   
         
 
- 
 
-
-
-
-
-
+    
+def ask_gpt(prompt, model="gpt-4o-mini"):
+    detailed_prompt = prompt + " , Using the text before here, I want you to start creating a routine for the user depending on how many days they specify. Return your answer in the format Example: summary: Day 1: Learn Multiplication in 10 days description: Start learning your twos (add much more detail here this is just an example) colorID: 6 start:{ dateTime:2024-07-31T19:00:00, timeZone: America/New_York, } end:{ dateTime:2024-07-31T23, timeZone: America/New_York) The events need to start from tomorrow and go on for the amount requested creating events for each day. Do not add any other information or confirmation. Todays date is 2024-08-02"
+    
+    messages = [{"role": "user", "content": detailed_prompt}]
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        temperature=0,
+    )
+    return response.choices[0].message["content"]
 
 
 
@@ -191,15 +226,18 @@ def index():
 def protected_area():
     return render_template("goals.html",names = session['name']) 
 
-@app.route("/calendar")
+@app.route("/calendar", methods = ["GET","POST"])
 def calendar():
     eventlist = main()
     return render_template("calendar.html", calendarlist = eventlist)
 
-@app.route("/processingevent",methods=["POST"])
+@app.route("/processingevent",methods=["GET","POST"])
 def processingevent():
-    eventcreation()
-    return "Success"
+    user_input = request.form['goal']
+    chatgpt_response = ask_gpt(user_input)
+    parsing_events(chatgpt_response)
+    # eventcreation()
+    return render_template("eventcreated.html", goal = request.form['goal'], details = chatgpt_response, date = request.form['date'] )
     
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
@@ -211,4 +249,3 @@ if __name__ == "__main__":
 
 
 #CODE
-
