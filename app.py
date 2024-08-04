@@ -4,6 +4,7 @@ import datetime
 import requests
 import openai
 import re
+import sqlite3
 #from openai import OpenAI
 from flask import Flask, session, abort, redirect, request, render_template, jsonify
 from google.oauth2 import id_token
@@ -39,7 +40,35 @@ SCOPES = ["https://www.googleapis.com/auth/calendar"]
 class user:
     creds = None
 
-#client = OpenAI()
+#Database
+con = sqlite3.connect("events.db" ,check_same_thread=False) #Con represents connection to database
+
+#We need a cursor to execute SQL statments
+cur = con.cursor()
+
+# cur.execute("""
+#             CREATE TABLE routines(
+#                 title text,
+#                 description text,
+#                 start text,
+#                 end text
+#             ) """)
+
+# print("done.")
+
+# cur.execute("""
+#             CREATE TABLE goals(
+#                 goal text,
+#                 description text,
+#                 end date text
+#                 )
+#             """)
+
+# print("done x2")
+
+
+
+
 
 def main():
     #This section checks for credentials
@@ -140,11 +169,18 @@ def parsing_events(initial_response):
         
 def eventcreation(gptevent):
     creds = user.creds
-    service = build("calendar", "v3", credentials = creds)
+    service = build("calendar", "v3", credentials=creds)
     
     event = gptevent
     
-    event = service.events().insert(calendarId = "primary",body = event).execute()
+    cur.execute("INSERT INTO routines (title, description, start, end) VALUES (?, ?, ?, ?)",
+                (event["summary"], event["description"], event["start"].get("dateTime", event["start"].get("date")),
+                 event["end"].get("dateTime", event["end"].get("date"))))
+    event = service.events().insert(calendarId="primary", body=event).execute()
+    
+    # Commit command
+    con.commit()
+
     print(f"Event Created {event.get('htmlLink')}")
     
    
@@ -165,7 +201,10 @@ def ask_gpt(prompt, model="gpt-4o-mini"):
 
 
 
-
+def setgoal(user_input, details, endDate):
+    cur.execute("INSERT INTO goals (goal, description,end) VALUES (?, ?, ?)",
+                (user_input,  details, endDate))
+    con.commit()
 
 
 
@@ -224,7 +263,11 @@ def index():
 @app.route("/goals")
 @login_is_required
 def protected_area():
-    return render_template("goals.html",names = session['name']) 
+    allGoals = con.execute("SELECT rowid, * FROM goals")
+    tupleList = ()
+    for goal in allGoals:
+        tupleList += goal
+    return render_template("goals.html",names = session['name'], goals = tupleList )
 
 @app.route("/calendar", methods = ["GET","POST"])
 def calendar():
@@ -234,10 +277,14 @@ def calendar():
 @app.route("/processingevent",methods=["GET","POST"])
 def processingevent():
     user_input = request.form['goal']
+    details = request.form['details']
+    enddate = request.form['date']
     chatgpt_response = ask_gpt(user_input)
     parsing_events(chatgpt_response)
     # eventcreation()
-    return render_template("eventcreated.html", goal = request.form['goal'], details = chatgpt_response, date = request.form['date'] )
+    
+    setgoal(user_input,details,enddate)
+    return render_template("eventcreated.html", goal = request.form['goal'], details = chatgpt_response, date = enddate )
     
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
@@ -245,7 +292,8 @@ if __name__ == "__main__":
     
 
     
-
+#close connection
+    cur.close()
 
 
 #CODE
