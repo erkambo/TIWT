@@ -8,8 +8,9 @@
 </head>
 
 <body style = "background-color:#76cffb">
-    <h1> This is a website for <strong>freaks.</strong>
-    </h1>
+    <h1> This is a website for <strong>freaks.</strong> </h1>
+    <h2> Hello {{names}}! <br/> <a href='/logout'><button>Logout</button> <br/> <a href='/calendar'><button>calendar</button></a> </h2>
+    
     <p>
         Tomorrow I want to is for procastinators and dumbusses alike!
         <img src = "/static/favico.ico.png" width ="100" height="100">
@@ -19,12 +20,7 @@
 
 <a href="https://github.com/erkambo/TIWT/">visit the github</a>
 
-        <form>
-            <label for = "goal"> Goal: </label>
-            <input type="text" id="frame" name="goal"><br>
-            <label for = "details">Details:</label>
-            <textarea name = "details" rows = "10" cols="30"></textarea>
-        </form>
+        {{goals}}
 
     </pre>
 
