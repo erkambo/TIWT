@@ -1,0 +1,76 @@
+body {
+    background-color: #76cffb;
+}
+
+button {
+    background-image: linear-gradient(to right, #860cd8, #530885);
+    border-radius: 20px;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    cursor: pointer;
+    padding: 10px 25px;
+}
+
+.newgoal {
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: all 0.3s ease-in-out;
+    z-index: -1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.newgoal.open {
+    opacity: 1;
+    z-index: 999;
+}
+
+.goal-inner {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    padding: 15px 25px;
+    text-align: center;
+    width: 380px;
+}
+
+.goal-inner h3 {
+    margin: 0;
+}
+
+.goal-inner p {
+    line-height: 24px;
+    margin: 10px 0;
+}
+
+.center {
+    padding: 400px 0;
+    text-align: center;
+}
+
+.center h2 {
+   font-size: 50px;
+}
+
+.center button{
+    background-image: linear-gradient(to right, #860cd8, #530885);
+    border-radius: 40px;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    cursor: pointer;
+    padding: 10px 25px;
+    width: 180px;
+    height: 60px;
+    font-size: 25px;
+
+
+}

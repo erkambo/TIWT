@@ -16,14 +16,17 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from dotenv import load_dotenv
+
+load_dotenv() #loads env variables
 
 app = Flask("Google Login App")
-app.secret_key = "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" # make sure this matches with that's in client_secret.json
-openai.api_key = "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" #api key
+app.secret_key = os.getenv('SECRET_KEY')
+openai.api_key = os.getenv('GPTAPI_KEY')
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1" # to allow Http traffic for local dev
 
-GOOGLE_CLIENT_ID = "255099809593-78h1jr7mubuto6s7iern9ebdf0l14umk.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
 flow = Flow.from_client_secrets_file(
@@ -69,8 +72,7 @@ cur = con.cursor()
 
 
 
-
-def main():
+def getcreds():
     #This section checks for credentials
     creds = None 
     
@@ -88,7 +90,9 @@ def main():
         with open("token.json", "w") as token: #write to file token.json
             token.write(creds.to_json())
             
-            
+def main():
+    
+    creds = user.creds
     try: #Get a list of events in your calendar
         service = build("calendar", "v3", credentials=creds)
 
@@ -201,11 +205,6 @@ def ask_gpt(prompt, model="gpt-4o-mini"):
 
 
 
-def setgoal(user_input, details, endDate):
-    cur.execute("INSERT INTO goals (goal, description,end) VALUES (?, ?, ?)",
-                (user_input,  details, endDate))
-    con.commit()
-
 
 
 def login_is_required(function):
@@ -223,6 +222,7 @@ def login_is_required(function):
 def login():
     authorization_url, state = flow.authorization_url()
     session["state"] = state
+    
     return redirect(authorization_url)
 
 
@@ -246,6 +246,7 @@ def callback():
 
     session["google_id"] = id_info.get("sub")
     session["name"] = id_info.get("name")
+    session["email"] = id_info.get("email")
     return redirect("/goals")
 
 
@@ -263,28 +264,50 @@ def index():
 @app.route("/goals")
 @login_is_required
 def protected_area():
-    allGoals = con.execute("SELECT rowid, * FROM goals")
-    tupleList = ()
+    getcreds()
+    allGoals = list(con.execute (f"SELECT rowid, * FROM goals WHERE email = '{session['email']}'"))
+    tupleList = []
     for goal in allGoals:
-        tupleList += goal
-    return render_template("goals.html",names = session['name'], goals = tupleList )
+        tupleList.append(goal[1])
+        
+    else:
+        return render_template("goals.html",names = session['name'], email = session['email'], goals = list(tupleList))
 
 @app.route("/calendar", methods = ["GET","POST"])
 def calendar():
     eventlist = main()
-    return render_template("calendar.html", calendarlist = eventlist)
+    return render_template("calendar.html", calendarlist = list(eventlist.values()))
 
 @app.route("/processingevent",methods=["GET","POST"])
 def processingevent():
-    user_input = request.form['goal']
+    
+    if 'delete' in request.form:
+        goal_to_delete = request.form['delete']
+        cur.execute("DELETE FROM goals WHERE goal = ?", (goal_to_delete,))
+        con.commit()
+        return redirect("/goals")
+    
+    else:
+        user_input = request.form['goal']
+        
+        chatgpt_response = ask_gpt(user_input)
+        parsing_events(chatgpt_response)
+        # eventcreation()
+        return redirect("/goals")
+
+
+@app.route("/setgoal", methods=["GET","POST"])
+def setgoal():
+    user_input = request.form['goalcreation']
     details = request.form['details']
     enddate = request.form['date']
-    chatgpt_response = ask_gpt(user_input)
-    parsing_events(chatgpt_response)
-    # eventcreation()
     
-    setgoal(user_input,details,enddate)
-    return render_template("eventcreated.html", goal = request.form['goal'], details = chatgpt_response, date = enddate )
+    cur.execute("INSERT INTO goals (goal, description,end,email) VALUES (?, ?, ?, ?)",
+                (user_input,  details, enddate, session['email']))
+    con.commit()
+    
+    return render_template("eventcreated.html", goal = user_input,details = details, date = enddate )
+    
     
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)

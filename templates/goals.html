@@ -1,34 +1,72 @@
 <!DOCTYPE html>
-<html lang = "en">
-
-
-<head>  
-<title> Tomorrow I want to... </title>
-<link rel="icon" type="image/x-icon" href="/static/favico.ico.png">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Goals</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-
-<body style = "background-color:#76cffb">
-    <h1> This is a website for <strong>freaks.</strong> </h1>
-    <h2> Hello {{names}}! <br/> <a href='/logout'><button>Logout</button> <br/> <a href='/calendar'><button>calendar</button></a> </h2>
+<body style="background-color:#D8860C">
+    <h2>Hello {{names}}! With Email Address: {{email}} <br/> 
+        <a href='/logout'><button>Logout</button></a> <br/> <a href='/calendar'><button>Calendar</button></a></h2> <img src="/static/favico.ico.png" width="300" height="300">
     
     <p>
-        Tomorrow I want to is for procastinators and dumbusses alike!
-        <img src = "/static/favico.ico.png" width ="100" height="100">
+        Tomorrow I want to is for procrastinators and others alike!
+        
     </p>
+
+    <button id="goalbutton">New Goal</button>
+
+    <div class="newgoal" id="newgoal">
+        <div class="goal-inner">
+            <h3>Create a new goal starting from tomorrow</h3>
+            <form action="{{ url_for('setgoal') }}" method="POST">
+                <label for="goalcreation">Goal:</label><br>
+                <input type="text" id="goalcreation" name="goalcreation"><br>
+        
+                <label for="details">Details:</label><br>
+                <textarea name="details" id="details" rows="10" cols="30"></textarea><br>
+        
+                <label for="date">End Date:</label><br>
+                <input type="text" id="date" name="date"><br>
+        
+                <button type="submit">Create Goal</button> 
+            </form> 
+            <button id="closegoal">Close</button>
+        </div>
+    </div>
+
+    <div>
+        
+            <h1>Your goals:</h1>
+            <hr>
+            <h2>
+            {%if goals %}
+                {% for goal in goals %}
+                    <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
+{{ goal }}  <button type="submit" style="border:none; background:none;">
+                            <img src="/static/greencheck.png" width="30" height="30" alt="Complete">
+                            <input type="hidden" name="goal" value="{{ goal }}">
+                        </button>
+                        
+                    </form>
+                    
+                    <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
+                        <button type="submit" style="border:none; background:none;">
+                            <img src="/static/redx.png" width="30" height="30" alt="Deleted">
+                            <input type="hidden" name="delete" value="{{ goal }}">
+                        </button>
+                    </form>
+                     <br><br>
+                {% endfor %}
+            {%else %}
+               <p>No goals found </p>
+            {%endif%}  
+            </h2>
+            
+        
+    </div>
     
-    <pre>
-
-<a href="https://github.com/erkambo/TIWT/">visit the github</a>
-
-        {{goals}}
-
-    </pre>
-
-    <hr>
+  
+    <script src="/static/script.js"></script>
 </body>
-
-
-
-
-
 </html>
