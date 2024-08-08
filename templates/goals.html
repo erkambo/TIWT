@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head class = "header">
     <meta charset="UTF-8">
     <title>Goals</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
-<body style="background-color:#D8860C">
-    <h2>Hello {{names}}! With Email Address: {{email}} <br/> 
-        <a href='/logout'><button>Logout</button></a> <br/> <a href='/calendar'><button>Calendar</button></a></h2> <img src="/static/favico.ico.png" width="300" height="300">
-    
-    <p>
-        Tomorrow I want to is for procrastinators and others alike!
+<body >
+    <div class = "header">
+        <a href='/logout'><button>Logout</button></a> <a href='/calendar'><button>Calendar</button></a> 
         
-    </p>
+        <div class = "goal-welcome">
+            <h2>Hello {{names}}!</h2> 
+            <p > With Email Address: {{email}}</p> <br>
+        
+        </div>
+    </div>
+    
+    
+     <img class = "logo" src="/static/favico.ico.png"  width ="300" height="300">
+    
+    
 
-    <button id="goalbutton">New Goal</button>
+    
 
     <div class="newgoal" id="newgoal">
         <div class="goal-inner">
@@ -36,36 +43,53 @@
     </div>
 
     <div>
-        
-            <h1>Your goals:</h1>
-            <hr>
-            <h2>
-            {%if goals %}
-                {% for goal in goals %}
-                    <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
-{{ goal }}  <button type="submit" style="border:none; background:none;">
-                            <img src="/static/greencheck.png" width="30" height="30" alt="Complete">
-                            <input type="hidden" name="goal" value="{{ goal }}">
-                        </button>
-                        
-                    </form>
-                    
-                    <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
-                        <button type="submit" style="border:none; background:none;">
-                            <img src="/static/redx.png" width="30" height="30" alt="Deleted">
-                            <input type="hidden" name="delete" value="{{ goal }}">
-                        </button>
-                    </form>
-                     <br><br>
-                {% endfor %}
-            {%else %}
-               <p>No goals found </p>
-            {%endif%}  
-            </h2>
-            
-        
-    </div>
+        <h1 style="font-size: 3vw; margin-right:47vw; margin-left:10vw;" class="inline">Your goals:</h1>
+        <button id="goalbutton" class="goalbutton inline">New Goal</button>
+        <hr>
     
+        <div style="display: flex; justify-content: space-between;">
+            <div class="goal-goals" style="width: 60%;">
+                <h2 style="color: green;">
+                    {% if goals %}
+                        {% for goal in goals %}
+                            <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
+                                {{ goal }}
+                                <button type="submit" style="border:none; background:none;">
+                                    <img src="/static/greencheck.png" width="30" height="30" alt="Complete">
+                                    <input type="hidden" name="goal" value="{{ goal }}">
+                                </button>
+                            </form>
+                            
+                            <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
+                                <button type="submit" style="border:none; background:none;">
+                                    <img src="/static/redx.png" width="30" height="30" alt="Deleted">
+                                    <input type="hidden" name="delete" value="{{ goal }}">
+                                </button>
+                            </form>
+                            <br><br>
+                        {% endfor %}
+                    {% else %}
+                        <p>No goals found</p>
+                    {% endif %}
+                </h2>
+            </div>
+            
+            <div style="width: 70%; font-size:1vw"> <!-- Adjust the width as necessary -->
+                <pre>
+                    Tomorrow I want to is a webapp designed to bring your goals starting 
+                    tomorrow to life! Simply create a goal with your description and desired
+                    enddate and watch your google calendar get populated with daily events
+                    containing detailed instructions to achieve your goal.
+
+                    Why are you waiting?
+                    Give it a try!
+
+                                                Sample Goal:
+                                            <img src="/static/sample.png" style="height:10vw; width:12vw;">
+                </pre>
+            </div>
+        </div>
+    </div>
   
     <script src="/static/script.js"></script>
 </body>

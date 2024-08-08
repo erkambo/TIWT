@@ -1,22 +1,28 @@
 <!DOCTYPE html>
-<html lang = en>
+<html lang="en">
 <head>
-<h1>Here is your calendar</h1>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-
-<body>  
-    <iframe src="https://calendar.google.com/calendar/u/0?cid=Ym95YWNpb2dsdWVya2FtQGdtYWlsLmNvbQ" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
-    <pre> 
-        {% for event in calendarlist %}
-            {{calendarlist  }}
-        {% endfor %}
-
-
-
+<body>
+    <h1>Here is your calendar</h1>
     
-
-
-    
-    </pre>
+        <p style="font-size:30px">Upcoming Events:</p>
+    </div>
+    <div class="parent">
+        <div class="child"  >
+            {% for event in calendarlist %} 
+            <div>{{ event }}</div>
+            {% endfor %}
+        </div>
+        <div class="child">
+            {% for date in datelist %}
+                <div>{{ date }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div>
 </body>
-
+</html>

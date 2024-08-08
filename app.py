@@ -126,10 +126,10 @@ def main():
     except HttpError as error:
         print(f"An error occurred: {error}")
         
-def parsing_events(initial_response):
+def parsing_events(initial_response,user_input):
     #Splitting response into individual day entries:
     day_entries = initial_response.split("Day ")
-    
+    stripped_input = user_input.replace("I want to","")
     for entry in day_entries[1:]:
         #Extract day number
         day_number = entry.split(":")[0].strip()
@@ -137,7 +137,7 @@ def parsing_events(initial_response):
         #extract summary
         
         summary_match = re.search(r'summary: ([^\n]+)', entry) #includes else condition so it at least shows something
-        summary = summary_match.group(0) if summary_match else f"Day {day_number}"
+        summary = summary_match.group(0) if summary_match else f"Day {day_number}: {stripped_input}"
                                   
         # Extract description
         description_match = re.search(r'description: ([^\n]+)', entry)
@@ -193,7 +193,8 @@ def eventcreation(gptevent):
 
     
 def ask_gpt(prompt, model="gpt-4o-mini"):
-    detailed_prompt = prompt + " , Using the text before here, I want you to start creating a routine for the user depending on how many days they specify. Return your answer in the format Example: summary: Day 1: Learn Multiplication in 10 days description: Start learning your twos (add much more detail here this is just an example) colorID: 6 start:{ dateTime:2024-07-31T19:00:00, timeZone: America/New_York, } end:{ dateTime:2024-07-31T23, timeZone: America/New_York) The events need to start from tomorrow and go on for the amount requested creating events for each day. Do not add any other information or confirmation. Todays date is 2024-08-02"
+    todays_date = datetime.date.today()
+    detailed_prompt = prompt + " , Using the text before here, I want you to start creating a routine for the user depending on how many days they specify. Return your answer in the format Example: summary: Day 1: Learn Multiplication in 10 days description: Start learning your twos (add much more detail here this is just an example) colorID: 6 start:{ dateTime:2024-07-31T19:00:00, timeZone: America/New_York, } end:{ dateTime:2024-07-31T23, timeZone: America/New_York) The events need to start from tomorrow and go on for the amount requested creating events for each day. Do not add any other information or confirmation. Dont just say Day: say Day: goal for titles" + f"Todays date is {todays_date}"
     
     messages = [{"role": "user", "content": detailed_prompt}]
     response = openai.ChatCompletion.create(
@@ -276,7 +277,7 @@ def protected_area():
 @app.route("/calendar", methods = ["GET","POST"])
 def calendar():
     eventlist = main()
-    return render_template("calendar.html", calendarlist = list(eventlist.values()))
+    return render_template("calendar.html", calendarlist = list(eventlist.values()),datelist = list(eventlist.keys()))
 
 @app.route("/processingevent",methods=["GET","POST"])
 def processingevent():
@@ -291,7 +292,7 @@ def processingevent():
         user_input = request.form['goal']
         
         chatgpt_response = ask_gpt(user_input)
-        parsing_events(chatgpt_response)
+        parsing_events(chatgpt_response,user_input)
         # eventcreation()
         return redirect("/goals")
 
