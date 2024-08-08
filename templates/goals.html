@@ -1,34 +1,96 @@
 <!DOCTYPE html>
-<html lang = "en">
-
-
-<head>  
-<title> Tomorrow I want to... </title>
-<link rel="icon" type="image/x-icon" href="/static/favico.ico.png">
+<html lang="en">
+<head class = "header">
+    <meta charset="UTF-8">
+    <title>Goals</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-
-<body style = "background-color:#76cffb">
-    <h1> This is a website for <strong>freaks.</strong> </h1>
-    <h2> Hello {{names}}! <br/> <a href='/logout'><button>Logout</button> <br/> <a href='/calendar'><button>calendar</button></a> </h2>
+<body >
+    <div class = "header">
+        <a href='/logout'><button>Logout</button></a> <a href='/calendar'><button>Calendar</button></a> 
+        
+        <div class = "goal-welcome">
+            <h2>Hello {{names}}!</h2> 
+            <p > With Email Address: {{email}}</p> <br>
+        
+        </div>
+    </div>
     
-    <p>
-        Tomorrow I want to is for procastinators and dumbusses alike!
-        <img src = "/static/favico.ico.png" width ="100" height="100">
-    </p>
     
-    <pre>
+     <img class = "logo" src="/static/favico.ico.png"  width ="300" height="300">
+    
+    
 
-<a href="https://github.com/erkambo/TIWT/">visit the github</a>
+    
 
-        {{goals}}
+    <div class="newgoal" id="newgoal">
+        <div class="goal-inner">
+            <h3>Create a new goal starting from tomorrow</h3>
+            <form action="{{ url_for('setgoal') }}" method="POST">
+                <label for="goalcreation">Goal:</label><br>
+                <input type="text" id="goalcreation" name="goalcreation"><br>
+        
+                <label for="details">Details:</label><br>
+                <textarea name="details" id="details" rows="10" cols="30"></textarea><br>
+        
+                <label for="date">End Date:</label><br>
+                <input type="text" id="date" name="date"><br>
+        
+                <button type="submit">Create Goal</button> 
+            </form> 
+            <button id="closegoal">Close</button>
+        </div>
+    </div>
 
-    </pre>
+    <div>
+        <h1 style="font-size: 3vw; margin-right:47vw; margin-left:10vw;" class="inline">Your goals:</h1>
+        <button id="goalbutton" class="goalbutton inline">New Goal</button>
+        <hr>
+    
+        <div style="display: flex; justify-content: space-between;">
+            <div class="goal-goals" style="width: 60%;">
+                <h2 style="color: green;">
+                    {% if goals %}
+                        {% for goal in goals %}
+                            <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
+                                {{ goal }}
+                                <button type="submit" style="border:none; background:none;">
+                                    <img src="/static/greencheck.png" width="30" height="30" alt="Complete">
+                                    <input type="hidden" name="goal" value="{{ goal }}">
+                                </button>
+                            </form>
+                            
+                            <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
+                                <button type="submit" style="border:none; background:none;">
+                                    <img src="/static/redx.png" width="30" height="30" alt="Deleted">
+                                    <input type="hidden" name="delete" value="{{ goal }}">
+                                </button>
+                            </form>
+                            <br><br>
+                        {% endfor %}
+                    {% else %}
+                        <p>No goals found</p>
+                    {% endif %}
+                </h2>
+            </div>
+            
+            <div style="width: 70%; font-size:1vw"> <!-- Adjust the width as necessary -->
+                <pre>
+                    Tomorrow I want to is a webapp designed to bring your goals starting 
+                    tomorrow to life! Simply create a goal with your description and desired
+                    enddate and watch your google calendar get populated with daily events
+                    containing detailed instructions to achieve your goal.
 
-    <hr>
+                    Why are you waiting?
+                    Give it a try!
+
+                                                Sample Goal:
+                                            <img src="/static/sample.png" style="height:10vw; width:12vw;">
+                </pre>
+            </div>
+        </div>
+    </div>
+  
+    <script src="/static/script.js"></script>
 </body>
-
-
-
-
-
 </html>

@@ -1,0 +1,156 @@
+body {
+    background-color: #96cffb;
+    font-family: "Helvetica", "sans-serif";
+
+}
+
+.logo{
+    position: absolute;
+    right:0;
+    top:0;
+    width:10vw;
+    height:10vw;
+}
+
+.header button {
+    background-image: linear-gradient(to right, #c0731b, #ee850e);
+    border-radius: 0px;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    cursor: pointer;
+    padding: unset;
+    width: 10vw;
+    height: 2vw;
+    text-align: center;
+    font-size: 1vw;
+
+}
+button {
+    background-image: linear-gradient(to right, #860cd8, #530885);
+    border-radius: 20vw;
+    border: 0.1vw solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    cursor: pointer;
+    padding: unset;
+    text-align: center;
+}
+.inline{
+    display: inline;
+}
+
+.goal-welcome{
+    text-align: center;
+    font-size: 1.5vw;
+}
+.goalbutton{
+    background-image: linear-gradient(to right, #860cd8, #530885);
+    border-radius: 20vw;
+    border: 0.1vw solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    cursor: pointer;
+    padding: unset;
+    width: 15vw;
+    height: 3vw;
+    text-align: center;
+    font-size: 2vw;
+    
+}
+.goal-goals{
+    font-size: 1vw;
+    margin-right:4vw;
+    display: inline;
+    
+}
+.goal-goals button{
+    width: 3vw;
+    height: 3vw;
+    outline:none;
+    padding: unset;
+
+}
+.goal-goals img{
+    width: 3vw;
+    height: 3vw;
+}
+.newgoal {
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: all 0.3s ease-in-out;
+    z-index: -1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.newgoal.open {
+    opacity: 1;
+    z-index: 999;
+}
+
+.goal-inner {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    padding: 15px 25px;
+    text-align: center;
+    width: 380px;
+}
+
+.goal-inner h3 {
+    margin: 0;
+}
+
+.goal-inner p {
+    line-height: 24px;
+    margin: 10px 0;
+}
+
+.center {
+    padding: 200px 0;
+    text-align: center;
+}
+
+.center h2 {
+   font-size: 90px;
+}
+
+
+.center button {
+    background-image: linear-gradient(to right, #860cd8, #530885);
+    border-radius: 40px;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    cursor: pointer;
+    padding: 10px 25px;
+    width: 260px;
+    height: 120px;
+    font-size: 40px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.parent {
+    display: flex;
+    justify-content: space-around;
+    background-color: mediumpurple;
+    padding: 1px;
+    min-height: auto;
+    max-height: auto;
+}
+
+.child {
+    display: inline-block;
+    width: 45%;
+    padding: 10px;
+    line-height: 30px;
+    font-size: 30px;
+}

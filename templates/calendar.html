@@ -1,30 +1,28 @@
 <!DOCTYPE html>
-<html lang = en>
+<html lang="en">
 <head>
-<h1>Here is your calendar</h1>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-
 <body>
-    <pre> 
-    {{calendarlist}}
-
-
-
-    <form action="{{ url_for('processingevent') }}" method="POST">  <!-- The form action sends all the data of the form to the specified url -->
-        <label for = "goal"> Goal: </label>
-        <input type="text" id="goal" name="goal"><br>
-
-        <label for = "details">Details:</label>
-        <textarea name = "details" id = "details" rows = "10" cols="30"></textarea><br>
-
-        <label for = "date"> End Date: </label><br>
-        <input type = "text" id = "date" name = "date">
-
-        <button type="submit">Create Event</button> 
-    </form> 
-
-
+    <h1>Here is your calendar</h1>
     
-    </pre>
+        <p style="font-size:30px">Upcoming Events:</p>
+    </div>
+    <div class="parent">
+        <div class="child"  >
+            {% for event in calendarlist %} 
+            <div>{{ event }}</div>
+            {% endfor %}
+        </div>
+        <div class="child">
+            {% for date in datelist %}
+                <div>{{ date }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div>
 </body>
-
+</html>
