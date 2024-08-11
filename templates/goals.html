@@ -8,7 +8,8 @@
 </head>
 <body >
     <div class = "header">
-        <a href='/logout'><button>Logout</button></a> 
+        <a href='/logout'><button>Logout</button></a>
+        <a href = '/calendar'><button>Calendar</button></a>
         
         <div class = "goal-welcome">
             <h2>Hello {{names}}!</h2> 
@@ -34,8 +35,9 @@
                 <label for="details">Details:</label><br>
                 <textarea name="details" id="details" rows="10" cols="30"></textarea><br>
         
-                <label for="date">End Date:</label><br>
-                <input type="text" id="date" name="date"><br>
+                <label for="date">End Date: (yyyy-mm-dd)</label><br>
+                <input type="text" pattern="202[4-5]-((0[1-9])|(1[0-2]))-(([1-2][0-9])|(3[0-1])|(0[1-9]))" id="date" name="date"/><br>
+
         
                 <button type="submit">Create Goal</button> 
             </form> 
@@ -54,17 +56,21 @@
                     {% if goals %}
                         {% for goal in goals %}
                             <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
-                                {{ goal }}
-                                <button type="submit" style="border:none; background:none;">
-                                    <img src="/static/greencheck.png" width="30" height="30" alt="Complete">
-                                    <input type="hidden" name="goal" value="{{ goal }}">
-                                </button>
+                                <span class="goal-item" data-tooltip="{{ goal.details }}">{{ goal.title }}</span>
+                                {% if goal.completed == 1 %}
+                                    <span class="goal-art" data-tooltip="In Progress"><img src="/static/in-progress.png" width="30" height="30" alt="Completed"></span>
+                                {% else %}
+                                    <button type="submit" style="border:none; background:none;">
+                                        <span class="goal-art" data-tooltip="Start Goal"><img src="/static/greencheck.png" width="30" height="30" alt="Complete"></span>
+                                        <input type="hidden" name="goal" value="{{ goal.title }}">
+                                    </button>
+                                {% endif %}
                             </form>
                             
                             <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
                                 <button type="submit" style="border:none; background:none;">
-                                    <img src="/static/redx.png" width="30" height="30" alt="Deleted">
-                                    <input type="hidden" name="delete" value="{{ goal }}">
+                                    <span class="goal-art" data-tooltip="Delete"><img src="/static/redx.png" width="30" height="30" alt="Deleted"></span>
+                                    <input type="hidden" name="delete" value="{{ goal.title }}">
                                 </button>
                             </form>
                             <br><br>

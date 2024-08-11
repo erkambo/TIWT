@@ -114,27 +114,94 @@ button {
     margin: 10px 0;
 }
 
-.center {
-    padding: 200px 0;
+.goal-item{
+    position: relative;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.goal-item:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%; /* Adjust positioning as necessary */
+    top: 0;
+    white-space: pre-line;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 1vw;
+    border-radius: 1vw;
+    width: 10vw;
+    z-index: 1000;
+    text-align: left;
+    font-size: 0.75vw;
+}
+
+.goal-item:hover::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    border-width: 1vw;
+    border-style: solid;
+    border-color: transparent rgba(0, 0, 0, 0.8) transparent transparent;
+}
+.goal-art{
+    position: relative;
+    cursor: pointer;
+}
+.goal-art:hover::after{
+    content: attr(data-tooltip);
+    position: absolute;
+    left: -5%; /* Adjust positioning as necessary */
+    top: 20%;
+    white-space: pre-line;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 0.5vw;
+    border-radius: 1vw;
+    width: auto;
+    z-index: 1000;
     text-align: center;
+    font-size: 0.5vw;
+}
+
+.goal-item:hover::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    border-width: 1vw;
+    border-style: solid;
+    border-color: transparent rgba(0, 0, 0, 0.8) transparent transparent;
+}
+
+.center {
+    align-self: center;
+    align-content: center;
+    text-align: center;
+
+    padding: 1000 10;
 }
 
 .center h2 {
-   font-size: 90px;
+   font-size: 3vw;
 }
 
+.center img {
+    width: 15vw;
+    height: 15vw;
+}
 
 .center button {
     background-image: linear-gradient(to right, #860cd8, #530885);
-    border-radius: 40px;
-    border: 1px solid transparent;
+    border-radius: 40vw;
+    border: 0.1vw solid transparent;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
     color: #fff;
     cursor: pointer;
-    padding: 10px 25px;
-    width: 260px;
-    height: 120px;
-    font-size: 40px;
+    width: 9vw;
+    height: 4vw;
+    font-size: 1.5vw;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
