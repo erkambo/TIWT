@@ -4,23 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendar</title>
+    <a href = '/logout' class = 'header'><button>Logout</button></a>
+    <a href = '/goals' class = 'header'><button>Goals</button></a>
+    <img src="/static/favico.ico.png" class = "logo">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <h1>Here is your calendar</h1>
     
-        <p style="font-size:30px">Upcoming Events:</p>
+        <p style="font-size:30px">Upcoming 10 Events:</p>
     </div>
     <div class="parent">
         <div class="child"  >
-            {% for event in calendarlist %} 
-            <div>{{ event }}</div>
-            {% endfor %}
-        </div>
-        <div class="child">
-            {% for date in datelist %}
-                <div>{{ date }}</div>
-            {% endfor %}
+            {% if calendarlist%}
+                {% for event in calendarlist %} 
+                <div>{{ event }}</div>
+                {% endfor %}
+            </div>
+            <div class="child">
+                {% for date in datelist %}
+                    <div>{{ date }}</div>
+                {% endfor %}
+            
+            {%else%}
+            <p>No events found!</p>
+            {%endif%}
         </div>
     </div>
     <div>
