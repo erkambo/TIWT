@@ -28,6 +28,7 @@
     <div class="newgoal" id="newgoal">
         <div class="goal-inner">
             <h3>Create a new goal starting from tomorrow</h3>
+            <p>TIWT supports goals up to <strong>14 days</strong></p>
             <form action="{{ url_for('setgoal') }}" method="POST">
                 <label for="goalcreation">Goal:</label><br>
                 <input type="text" id="goalcreation" name="goalcreation"><br>
@@ -56,7 +57,8 @@
                     {% if goals %}
                         {% for goal in goals %}
                             <form action="{{ url_for('processingevent') }}" method="post" style="display:inline;">
-                                <span class="goal-item" data-tooltip="{{ goal.details }}">{{ goal.title }}</span>
+                                <span class="goal-item" data-tooltip="{{ goal.details }}
+                                 Enddate: {{goal.time}}">{{ goal.title }}</span>
                                 {% if goal.completed == 1 %}
                                     <span class="goal-art" data-tooltip="In Progress"><img src="/static/in-progress.png" width="30" height="30" alt="Completed"></span>
                                 {% else %}
@@ -90,6 +92,7 @@
 
                     Why are you waiting?
                     Give it a try!
+                    PLEASE MAKE SURE YOUR GOAL DOES NOT PASS 2 WEEKS IN LENGTH!
 
                                                 Sample Goal:
                                             <img src="/static/sample.png" style="height:10vw; width:12vw;">
