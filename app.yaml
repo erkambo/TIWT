@@ -19,13 +19,15 @@ entrypoint: gunicorn -b :$PORT main:app
 runtime_config:
   operating_system: ubuntu22
 
-# This sample incurs costs to run on the App Engine flexible environment.
-# The settings below are to reduce costs during testing and are not appropriate
-# for production use. For more information, see:
-# https://cloud.google.com/appengine/docs/flexible/python/configuring-your-app-with-app-yaml
 manual_scaling:
   instances: 1
 resources:
   cpu: 1
   memory_gb: 0.5
   disk_size_gb: 10
+
+env_variables:
+  SECRET_KEY: "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"
+  GPTAPI_KEY: "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"
+  GOOGLE_CLIENT_ID: "255099809593-78h1jr7mubuto6s7iern9ebdf0l14umk.apps.googleusercontent.com"
+  OAUTHLIB_INSECURE_TRANSPORT: "1"
